@@ -6,10 +6,9 @@ def hash_password(password):
     salt = token_hex(32).encode()
     encoded_pw = password.encode()
     hashed_pw = blake2b(encoded_pw + salt).hexdigest()
-    return hashed_pw
+    return hashed_pw, salt
 
 
 hash = hash_password("password")
-hash2 = hash_password("password")
 
 print(hash)

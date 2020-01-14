@@ -5,7 +5,12 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/api/shipperlogin", methods=["POST"])
+@app.route("/api/create_account", methods=["POST"])
+def create_account():
+    pass 
+
+
+@app.route("/api/shipper_login", methods=["POST"])
 def shipper_login():
     pass
 
