@@ -7,7 +7,7 @@ CORS(app)
 
 @app.route("/api/create_account", methods=["POST"])
 def create_account():
-    pass 
+    pass
 
 
 @app.route("/api/shipper_login", methods=["POST"])
@@ -15,7 +15,7 @@ def shipper_login():
     pass
 
 
-@app.route("/api/NPlogin", methods=["POST"])
+@app.route("/api/np_login", methods=["POST"])
 def NP_login():
     pass
 
