@@ -1,5 +1,6 @@
 import sqlite3
 
+DBPATH = "final_project.db"
 
 
 def schema(DBPATH):
