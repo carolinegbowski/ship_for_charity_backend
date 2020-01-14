@@ -1,8 +1,10 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+from sqlite3 import connect
 
 app = Flask(__name__)
 CORS(app)
+DBPATH = "final_project.db"
 
 
 @app.route("/api/create_account", methods=["POST"])
@@ -12,7 +14,7 @@ def create_account():
 
 @app.route("/api/shipper_login", methods=["POST"])
 def shipper_login():
-    pass
+   pass
 
 
 @app.route("/api/np_login", methods=["POST"])

@@ -1,6 +1,5 @@
 import sqlite3
 
-DBPATH = "final_project.db"
 
 
 def schema(DBPATH):
@@ -10,7 +9,7 @@ def schema(DBPATH):
         cursor.execute(DROPSQL.format(tablename="np_accounts"))
         SQL = """ CREATE TABLE np_accounts (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
-                company_name VARCHAR NOT NULL,
+                company_name VARCHAR,
                 username VARCHAR NOT NULL,
                 password_hash VARCHAR
         );"""
@@ -20,7 +19,7 @@ def schema(DBPATH):
         SQL = """ CREATE TABLE shipper_accounts (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name VARCHAR,
-                username VARCHAR,
+                username VARCHAR NOT NULL,
                 password_hash VARCHAR
         );"""
         cursor.execute(SQL)
