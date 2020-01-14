@@ -14,11 +14,11 @@ def create_account():
 
 @app.route("/api/shipper_login", methods=["POST"])
 def shipper_login():
-   pass
+    pass
 
 
 @app.route("/api/np_login", methods=["POST"])
-def NP_login():
+def np_login():
     pass
 
 
@@ -27,8 +27,8 @@ def shipper_previous_routes():
     pass
 
 
-@app.route("/api/NP_previous_routes", methods=["POST"])
-def NP_previous_routes():
+@app.route("/api/np_previous_routes", methods=["POST"])
+def np_previous_routes():
     pass
 
 
