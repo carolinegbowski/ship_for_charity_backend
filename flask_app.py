@@ -61,16 +61,15 @@ def shipper_login():
     password = bytes(password, "utf-8")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        password_hash = """SELECT hashed_password FROM shipper_accounts
+        SQL = """SELECT password_hash FROM shipper_accounts
                     WHERE username=?;"""
 
-        password_hash = cursor.execute(password_hash,).fetchone()[0]
+        password_hash = cursor.execute(SQL, (username,)).fetchone()[0]
         if check_password(password, password_hash):
             SQL = """SELECT pk FROM shipper_accounts
                     WHERE username=?;"""
             shipper_pk = cursor.execute(SQL, (username,)).fetchone()[0]
             return jsonify({"pk": shipper_pk})
-            return jsonify({"shipper_pk": shipper_pk})
     return jsonify({"SQL": "ERROR"})
 
 
