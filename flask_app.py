@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from util import hash_password, check_password
 from sqlite3 import connect
 
 app = Flask(__name__)
@@ -12,17 +13,19 @@ def create_account():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
+    password = bytes(password, "utf-8")
+    hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """INSERT INTO shipper_accounts (
-        username, password) VALUES (?, ?);"""
-        values = (username, password)
+        username, password_hash) VALUES (?, ?);"""
+        values = (username, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM shipper_accounts
-        WHERE username=? AND password=?;"""
+        WHERE username=?;"""
 
-        np_pk = cursor.execute(SQL, values).fetchone()[0]
+        np_pk = cursor.execute(SQL, values).fetchone()
         return jsonify({"non_profit_pk": np_pk})
     return jsonify({"SQL": "ERROR"})
 
@@ -32,11 +35,13 @@ def shipper_account():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
+    password = bytes(password, "utf-8")
+    hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """INSERT INTO shipper_accounts (
-        username, password) VALUES (?, ?);"""
-        values = (username, password)
+        username, password_hash) VALUES (?, ?);"""
+        values = (username, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM shipper_accounts
@@ -52,12 +57,18 @@ def shipper_login():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
+    password = bytes(password, "utf-8")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """SELECT pk FROM shipper_accounts
-        WHERE username=? AND password=?;"""
-        shipper_pk = cursor.execute(SQL, (username, password)).fetchone()[0]
-        return jsonify({"shipper_pk": shipper_pk})
+        password_hash = """SELECT hashed_password FROM shipper_accounts
+                    WHERE username=?;"""
+
+        password_hash = cursor.execute(password_hash,).fetchone()[0]
+        if check_password(password, password_hash):
+            SQL = """SELECT pk FROM shipper_accounts
+                    WHERE username=?;"""
+            shipper_pk = cursor.execute(SQL, (username,)).fetchone()[0]
+            return jsonify({"shipper_pk": shipper_pk})
     return jsonify({"SQL": "ERROR"})
 
 
@@ -66,11 +77,16 @@ def np_login():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
+    password = bytes(password, "utf-8")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """SELECT username, password FROM np_accounts
-        WHERE username=?;"""
-        np_pk = cursor.execute(SQL, (username, password)).fetchone()[0]
+        password_hash = """SELECT hashed_password FROM shipper_accounts
+                        WHERE username=?;"""
+        password_hash = cursor.execute(password_hash,).fetchone()[0]
+        if check_password(password, password_hash):
+            SQL = """SELECT pk FROM shipper_accounts
+                    WHERE username=?;"""
+            np_pk = cursor.execute(SQL, (username,)).fetchone()[0]
         return jsonify({"non_profit_pk": np_pk})
     return jsonify({"SQL": "ERROR"})
 
