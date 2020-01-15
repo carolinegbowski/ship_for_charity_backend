@@ -46,7 +46,7 @@ def shipper_account():
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM shipper_accounts
-        WHERE username=? AND password=?;"""
+        WHERE username=? AND password_hash=?;"""
 
         shipper_pk = cursor.execute(SQL, values).fetchone()[0]
         return jsonify({"pk": shipper_pk})
