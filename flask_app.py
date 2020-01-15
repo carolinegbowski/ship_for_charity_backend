@@ -17,17 +17,16 @@ def create_account():
     hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """INSERT INTO shipper_accounts (
+        SQL = """INSERT INTO np_accounts (
         username, password_hash) VALUES (?, ?);"""
         values = (username, hashed_password)
         cursor.execute(SQL, values)
 
-        SQL = """SELECT pk FROM shipper_accounts
-        WHERE username=?;"""
+        SQL = """SELECT pk FROM np_accounts
+        WHERE username=? AND password_hash=?;"""
 
-        np_pk = cursor.execute(SQL, values).fetchone()
+        np_pk = cursor.execute(SQL, values).fetchone()[0]
         return jsonify({"pk": np_pk})
-        return jsonify({"non_profit_pk": np_pk})
     return jsonify({"SQL": "ERROR"})
 
 
@@ -81,16 +80,14 @@ def np_login():
     password = bytes(password, "utf-8")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        password_hash = """SELECT hashed_password FROM shipper_accounts
+        SQL = """SELECT password_hash FROM np_accounts
                         WHERE username=?;"""
-        password_hash = cursor.execute(password_hash,).fetchone()[0]
+        password_hash = cursor.execute(SQL, (username,)).fetchone()[0]
         if check_password(password, password_hash):
-            SQL = """SELECT pk FROM shipper_accounts
+            SQL = """SELECT pk FROM np_accounts
                     WHERE username=?;"""
             np_pk = cursor.execute(SQL, (username,)).fetchone()[0]
         return jsonify({"pk": np_pk})
-
-        return jsonify({"non_profit_pk": np_pk})
     return jsonify({"SQL": "ERROR"})
 
 
