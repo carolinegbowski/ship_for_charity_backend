@@ -11,7 +11,7 @@ def schema(DBPATH):
         SQL = """ CREATE TABLE np_accounts (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name VARCHAR,
-                username VARCHAR NOT NULL,
+                username VARCHAR NOT NULL UNIQUE,
                 password_hash VARCHAR
         );"""
         cursor.execute(SQL)
@@ -20,7 +20,7 @@ def schema(DBPATH):
         SQL = """ CREATE TABLE shipper_accounts (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name VARCHAR,
-                username VARCHAR NOT NULL,
+                username VARCHAR NOT NULL UNIQUE,
                 password_hash VARCHAR
         );"""
         cursor.execute(SQL)

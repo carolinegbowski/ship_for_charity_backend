@@ -27,6 +27,7 @@ def create_account():
 
         np_pk = cursor.execute(SQL, values).fetchone()
         return jsonify({"pk": np_pk})
+        return jsonify({"non_profit_pk": np_pk})
     return jsonify({"SQL": "ERROR"})
 
 
@@ -69,6 +70,7 @@ def shipper_login():
                     WHERE username=?;"""
             shipper_pk = cursor.execute(SQL, (username,)).fetchone()[0]
             return jsonify({"pk": shipper_pk})
+            return jsonify({"shipper_pk": shipper_pk})
     return jsonify({"SQL": "ERROR"})
 
 
@@ -88,6 +90,8 @@ def np_login():
                     WHERE username=?;"""
             np_pk = cursor.execute(SQL, (username,)).fetchone()[0]
         return jsonify({"pk": np_pk})
+
+        return jsonify({"non_profit_pk": np_pk})
     return jsonify({"SQL": "ERROR"})
 
 
