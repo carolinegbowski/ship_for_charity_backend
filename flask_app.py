@@ -91,8 +91,8 @@ def np_login():
     return jsonify({"SQL": "ERROR"})
 
 
-@app.route("/api/shipper_open_routes", methods=["POST"])
-def shipper_open_routes():
+@app.route("/api/shipper_new_route", methods=["POST"])
+def shipper_new_route():
     data = request.get_json()
     arrival_location = data.get("arrivalLocation")
     arrival_date = data.get("arrivalDate")
@@ -114,10 +114,14 @@ def shipper_open_routes():
             departure_location,
             available_containers,
         )
-        routes = cursor.execute(SQL, values)
-        return jsonify({"This": "Worked"})
+        cursor.execute(SQL, values)
+        return jsonify({"SQL": "Success"})
     return jsonify({"SQL": "Error"})
 
+
+@app.route("api/open_routes", methods=["POST"])
+def open_routes():
+    pass
 
 @app.route("/api/shipper_previous_routes", methods=["POST"])
 def shipper_previous_routes():
