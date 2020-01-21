@@ -94,24 +94,25 @@ def np_login():
 @app.route("/api/shipper_new_route", methods=["POST"])
 def shipper_new_route():
     data = request.get_json()
-    arrival_location = data.get("arrivalLocation")
-    arrival_date = data.get("arrivalDate")
+    shipper_account_id = data.get("shipperAccountID")
     departure_location = data.get("departureLocation")
     departure_date = data.get("departureDate")
+    arrival_location = data.get("arrivalLocation")
+    arrival_date = data.get("arrivalDate")
     available_containers = data.get("availableContainers")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """INSERT INTO routes (
+        SQL = """INSERT INTO routes ( shipper_account_id,
                 departure_location, departure_date,
                 arrival_location, arrival_date,
                 available_containers )
-                VALUES (?, ?, ?, ?, ?); """
+                VALUES (?, ?, ?, ?, ?, ?); """
         values = (
-            arrival_location,
-            arrival_date,
+            shipper_account_id,
             departure_location,
             departure_date,
-            departure_location,
+            arrival_location,
+            arrival_date,
             available_containers,
         )
         cursor.execute(SQL, values)
