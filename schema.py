@@ -28,7 +28,7 @@ def schema(DBPATH):
         cursor.execute(DROPSQL.format(tablename="routes"))
         SQL = """ CREATE TABLE routes (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
-                shipper_account_id INTEGER
+                shipper_account_id INTEGER,
                 departure_location VARCHAR,
                 departure_date VARCHAR,
                 arrival_location VARCHAR,
