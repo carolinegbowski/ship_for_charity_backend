@@ -119,7 +119,7 @@ def shipper_new_route():
     return jsonify({"SQL": "Error"})
 
 
-@app.route("api/open_routes", methods=["POST"])
+@app.route("/api/open_routes", methods=["POST"])
 def open_routes():
     pass
 
