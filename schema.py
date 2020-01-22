@@ -30,9 +30,10 @@ def schema(DBPATH):
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 shipper_account_id INTEGER,
                 departure_location VARCHAR,
-                departure_date VARCHAR,
+                departure_date INTEGER,
                 arrival_location VARCHAR,
-                arrival_date VARCHAR,
+                arrival_date INEGER,
+                total_containers INTEGER,
                 available_containers INTEGER,
                 FOREIGN KEY( shipper_account_id) REFERENCES shipper_accounts(pk)
         );"""

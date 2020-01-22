@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from util import hash_password, check_password
 from sqlite3 import connect
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -97,23 +98,26 @@ def shipper_new_route():
     shipper_account_id = data.get("shipperAccountID")
     departure_location = data.get("departureLocation")
     departure_date = data.get("departureDate")
+    date = int(datetime.datetime.strptime(departure_date, "%d/%m/%y").strftime("%s"))
     arrival_location = data.get("arrivalLocation")
     arrival_date = data.get("arrivalDate")
+    _date = int(datetime.datetime.strptime(arrival_date, "%d/%m/%y").strftime("%s"))
     available_containers = data.get("availableContainers")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """INSERT INTO routes ( shipper_account_id,
                 departure_location, departure_date,
                 arrival_location, arrival_date,
-                available_containers )
-                VALUES (?, ?, ?, ?, ?, ?); """
+                available_containers, total_containers )
+                VALUES (?, ?, ?, ?, ?, ?, ?); """
         values = (
             shipper_account_id,
             departure_location,
-            departure_date,
+            date,
             arrival_location,
-            arrival_date,
+            _date,
             available_containers,
+            available_containers
         )
         cursor.execute(SQL, values)
         return jsonify({"SQL": "Success"})
@@ -124,10 +128,13 @@ def shipper_new_route():
 def open_routes():
     pass
 
+
 @app.route("/api/shipper_previous_routes", methods=["POST"])
 def shipper_previous_routes():
-    pass
-
+    with connect(DBPATH) as connection:
+        cursor = connection.cursor()
+        SQL = """SELECT * FROM routes WHERE departure_date < strftime('%s', 'now');"""
+        cursor.execute(SQL,)
 
 @app.route("/api/np_previous_routes", methods=["POST"])
 def np_previous_routes():
