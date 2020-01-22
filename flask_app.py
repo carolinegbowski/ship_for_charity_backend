@@ -98,10 +98,10 @@ def shipper_new_route():
     shipper_account_id = data.get("shipperAccountID")
     departure_location = data.get("departureLocation")
     departure_date = data.get("departureDate")
-    date = int(datetime.datetime.strptime(departure_date, "%d/%m/%y").strftime("%s"))
+    date = int(datetime.datetime.strptime(departure_date, "%m/%d/%y").strftime("%s"))
     arrival_location = data.get("arrivalLocation")
     arrival_date = data.get("arrivalDate")
-    _date = int(datetime.datetime.strptime(arrival_date, "%d/%m/%y").strftime("%s"))
+    _date = int(datetime.datetime.strptime(arrival_date, "%m/%d/%y").strftime("%s"))
     available_containers = data.get("availableContainers")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
