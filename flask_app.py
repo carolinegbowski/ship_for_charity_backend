@@ -117,7 +117,7 @@ def shipper_new_route():
             arrival_location,
             _date,
             available_containers,
-            available_containers
+            available_containers,
         )
         cursor.execute(SQL, values)
         return jsonify({"SQL": "Success"})
@@ -134,7 +134,10 @@ def shipper_previous_routes():
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """SELECT * FROM routes WHERE departure_date < strftime('%s', 'now');"""
-        cursor.execute(SQL,)
+        routes = cursor.execute(SQL,).fetchall()
+        return jsonify({"Routes": routes})
+    return jsonify({"SQL": "ERROR"})
+
 
 @app.route("/api/np_previous_routes", methods=["POST"])
 def np_previous_routes():
