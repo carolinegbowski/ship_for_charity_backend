@@ -98,9 +98,10 @@ def shipper_new_route():
     shipper_account_id = data.get("shipperAccountID")
     departure_location = data.get("departureLocation")
     departure_date = data.get("departureDate")
-    date = datetime.datetime.strptime(departure_date, "%d/%m/%y").strftime("%s")
+    date = int(datetime.datetime.strptime(departure_date, "%d/%m/%y").strftime("%s"))
     arrival_location = data.get("arrivalLocation")
     arrival_date = data.get("arrivalDate")
+    _date = int(datetime.datetime.strptime(arrival_date, "%d/%m/%y").strftime("%s"))
     available_containers = data.get("availableContainers")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
@@ -114,10 +115,10 @@ def shipper_new_route():
             departure_location,
             date,
             arrival_location,
-            arrival_date,
+            _date,
             available_containers,
         )
-        cursor.execute(SQL, values)
+        # cursor.execute(SQL, values)
         return jsonify({"SQL": "Success"})
     return jsonify({"SQL": "Error"})
 
