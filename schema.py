@@ -32,7 +32,7 @@ def schema(DBPATH):
                 departure_location VARCHAR,
                 departure_date INTEGER,
                 arrival_location VARCHAR,
-                arrival_date INEGER,
+                arrival_date INTEGER,
                 total_containers INTEGER,
                 available_containers INTEGER,
                 FOREIGN KEY( shipper_account_id) REFERENCES shipper_accounts(pk)
