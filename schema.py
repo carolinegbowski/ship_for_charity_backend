@@ -29,7 +29,7 @@ def schema(DBPATH):
         SQL = """ CREATE TABLE routes (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 shipper_account_id INTEGER,
-                departure_location VARCHAR,
+                departure_location INTEGER,
                 departure_date VARCHAR,
                 arrival_location VARCHAR,
                 arrival_date VARCHAR,

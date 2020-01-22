@@ -1,7 +1,13 @@
-from sqlite3 import connect
+from sqlite3 import connect, Row
 from util import hash_password, check_password
+import datetime
 
 DBPATH = "final_project.db"
+
+
+def date_time(date, time):
+    if date < time:
+        return date
 
 
 def seed(dbpath=DBPATH):
@@ -32,4 +38,17 @@ def password_check(dbpath=DBPATH):
             print(user_pk)
 
 
-password_check()
+def check_dates(dpbath=DBPATH):
+    time = datetime.date.today()
+    time = time.strftime("%m/%d/%Y")
+    with connect(DBPATH) as connection:
+        connection.row_factory = Row
+        cursor = connection.cursor()
+        date = """ SELECT * FROM routes;"""
+        date = cursor.execute(date,).fetchall()
+        print(date)
+
+
+
+
+check_dates()

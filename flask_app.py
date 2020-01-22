@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from util import hash_password, check_password
 from sqlite3 import connect
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -97,6 +98,7 @@ def shipper_new_route():
     shipper_account_id = data.get("shipperAccountID")
     departure_location = data.get("departureLocation")
     departure_date = data.get("departureDate")
+    date = datetime.datetime.strptime(departure_date, "%d/%m/%y").strftime("%s")
     arrival_location = data.get("arrivalLocation")
     arrival_date = data.get("arrivalDate")
     available_containers = data.get("availableContainers")
@@ -110,7 +112,7 @@ def shipper_new_route():
         values = (
             shipper_account_id,
             departure_location,
-            departure_date,
+            date,
             arrival_location,
             arrival_date,
             available_containers,
@@ -124,9 +126,15 @@ def shipper_new_route():
 def open_routes():
     pass
 
+
 @app.route("/api/shipper_previous_routes", methods=["POST"])
 def shipper_previous_routes():
-    pass
+    data = request.get_json()
+    today = date.today()
+    today = today.strftime("m/%d/%Y")
+    with connect(DBATH) as connection:
+        cursor = connection.cursor()
+        pass
 
 
 @app.route("/api/np_previous_routes", methods=["POST"])
