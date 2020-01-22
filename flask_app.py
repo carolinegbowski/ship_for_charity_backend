@@ -108,8 +108,8 @@ def shipper_new_route():
         SQL = """INSERT INTO routes ( shipper_account_id,
                 departure_location, departure_date,
                 arrival_location, arrival_date,
-                available_containers )
-                VALUES (?, ?, ?, ?, ?, ?); """
+                available_containers, total_containers )
+                VALUES (?, ?, ?, ?, ?, ?, ?); """
         values = (
             shipper_account_id,
             departure_location,
@@ -117,8 +117,9 @@ def shipper_new_route():
             arrival_location,
             _date,
             available_containers,
+            available_containers
         )
-        # cursor.execute(SQL, values)
+        cursor.execute(SQL, values)
         return jsonify({"SQL": "Success"})
     return jsonify({"SQL": "Error"})
 
@@ -130,13 +131,10 @@ def open_routes():
 
 @app.route("/api/shipper_previous_routes", methods=["POST"])
 def shipper_previous_routes():
-    data = request.get_json()
-    today = date.today()
-    today = today.strftime("m/%d/%Y")
-    with connect(DBATH) as connection:
+    with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        pass
-
+        SQL = """SELECT * FROM routes WHERE departure_date < strftime('%s', 'now');"""
+        cursor.execute(SQL,)
 
 @app.route("/api/np_previous_routes", methods=["POST"])
 def np_previous_routes():
