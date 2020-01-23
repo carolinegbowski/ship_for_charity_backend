@@ -1,10 +1,10 @@
-import sqlite3
+from sqlite3 import connect
 
 DBPATH = "final_project.db"
 
 
-def schema(DBPATH):
-    with sqlite3.connect(DBPATH) as connection:
+def schema(dbpath=DBPATH):
+    with connect(dbpath) as connection:
         cursor = connection.cursor()
         DROPSQL = "DROP TABLE IF EXISTS {tablename};"
         cursor.execute(DROPSQL.format(tablename="np_accounts"))
@@ -32,7 +32,7 @@ def schema(DBPATH):
                 departure_location VARCHAR,
                 departure_date INTEGER,
                 arrival_location VARCHAR,
-                arrival_date INEGER,
+                arrival_date INTEGER,
                 total_containers INTEGER,
                 available_containers INTEGER,
                 FOREIGN KEY( shipper_account_id) REFERENCES shipper_accounts(pk)
@@ -51,4 +51,4 @@ def schema(DBPATH):
         cursor.execute(SQL)
 
 
-schema(DBPATH)
+schema()
