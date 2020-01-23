@@ -124,7 +124,7 @@ def shipper_new_route():
     return jsonify({"SQL": "Error"})
 
 
-@app.route("/api/np_new_route", methods=["POST"])
+@app.route("/api/np_search_routes", methods=["POST"])
 def open_routes():
     data = request.get_json()
     departure_location = data.get("departureLocation")
@@ -140,6 +140,11 @@ def open_routes():
         np_open_routes = cursor.execute(SQL, values).fetchall()
         return jsonify({"Non-profit Open routes": np_open_routes})
     return jsonify({"SQL": "ERROR"})
+
+
+@app.route("/api/np_new_route", methods=["POST"])
+def np_new_route():
+    pass
 
 
 @app.route("/api/shipper_previous_routes", methods=["POST"])
