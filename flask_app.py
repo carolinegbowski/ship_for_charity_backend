@@ -124,16 +124,29 @@ def shipper_new_route():
     return jsonify({"SQL": "Error"})
 
 
-@app.route("/api/open_routes", methods=["POST"])
+@app.route("/api/np_new_route", methods=["POST"])
 def open_routes():
-    pass
+    data = request.get_json()
+    departure_location = data.get("departureLocation")
+    arrival_location = data.get("arrivalLocation")
+    arrival_date = data.get("arrivalDate")
+    date = int(datetime.datetime.strptime(arrival_date, "%m/%d/%y").strftime("%s"))
+    with connect(DBPATH) as connection:
+        cursor = connection.cursor()
+        SQL = """ SELECT * FROM routes WHERE departure_location=?
+                AND arrival_location=? AND arrival_date < ?
+                AND departure_date > strftime('%s'); """
+        values = (departure_location, arrival_location, date, date)
+        open_routes = cursor.execute(SQL, values)
+        return jsonify({"Open routes": open_routes})
+    return jsonify({"SQL": "ERROR"})
 
 
 @app.route("/api/shipper_previous_routes", methods=["POST"])
 def shipper_previous_routes():
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """SELECT * FROM routes WHERE departure_date < strftime('%s', 'now');"""
+        SQL = """SELECT * FROM routes WHERE departure_date < strftime('%s');"""
         routes = cursor.execute(SQL,).fetchall()
         return jsonify({"Routes": routes})
     return jsonify({"SQL": "ERROR"})
