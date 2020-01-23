@@ -136,8 +136,8 @@ def open_routes():
         SQL = """ SELECT * FROM routes WHERE departure_location=?
                 AND arrival_location=? AND arrival_date < ?
                 AND departure_date > strftime('%s'); """
-        values = (departure_location, arrival_location, date, date)
-        open_routes = cursor.execute(SQL, values)
+        values = (departure_location, arrival_location, date)
+        open_routes = cursor.execute(SQL, values).fetchall()
         return jsonify({"Open routes": open_routes})
     return jsonify({"SQL": "ERROR"})
 
