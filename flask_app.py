@@ -137,8 +137,8 @@ def open_routes():
                 AND arrival_location=? AND arrival_date < ?
                 AND departure_date > strftime('%s'); """
         values = (departure_location, arrival_location, date)
-        open_routes = cursor.execute(SQL, values).fetchall()
-        return jsonify({"Open routes": open_routes})
+        np_open_routes = cursor.execute(SQL, values).fetchall()
+        return jsonify({"Non-profit Open routes": np_open_routes})
     return jsonify({"SQL": "ERROR"})
 
 
@@ -152,9 +152,35 @@ def shipper_previous_routes():
     return jsonify({"SQL": "ERROR"})
 
 
+@app.route("/api/shipper_open_routes", methods=["POST"])
+def shipper_open_routes():
+    data = request.get_json()
+    shipper_account_id = data.get("shipperAccountID")
+    departure_date = data.get("departureDate")
+    date = int(datetime.datetime.strptime(departure_date, "%m/%d/%y").strftime("%s"))
+    with connect(DBPATH) as connection:
+        cursor = connection.cursor()
+        SQL = """ SELECT * FROM routes WHERE shipper_account_id=?
+                AND departure_date > strftime('%s')
+                AND available_containers > 0;"""
+        values = (shipper_account_id, departure_date, date)
+        shipper_open_routes = cursor.execute(SQL, values).fetchall()
+        return jsonify({"Shipper open routes": shipper_open_routes})
+    return jsonify({"SQL": "ERROR"})
+
+
 @app.route("/api/np_previous_routes", methods=["POST"])
 def np_previous_routes():
-    pass
+    data = request.get_json()
+    np_account_id = data.get("npAccountID")
+    with connect(DBPATH) as connection:
+        cursor = connection.cursor()
+        SQL = """ SELECT * FROM routes JOIN partnerships ON routes.pk = partnerships.route_id
+                WHERE np_account_id=?;"""
+        values = (np_account_id,)
+        np_previous_routes = cursor.execute(SQL, values).fetchall()
+        return jsonify({"NP previous routes": np_previous_routes})
+    return jsonify({"SQL": "ERROR"})
 
 
 if __name__ == "__main__":
