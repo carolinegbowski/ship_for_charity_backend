@@ -161,14 +161,12 @@ def shipper_previous_routes():
 def shipper_open_routes():
     data = request.get_json()
     shipper_account_id = data.get("shipperAccountID")
-    departure_date = data.get("departureDate")
-    date = int(datetime.datetime.strptime(departure_date, "%m/%d/%y").strftime("%s"))
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """ SELECT * FROM routes WHERE shipper_account_id=?
                 AND departure_date > strftime('%s')
                 AND available_containers > 0;"""
-        values = (shipper_account_id, departure_date, date)
+        values = (shipper_account_id,)
         shipper_open_routes = cursor.execute(SQL, values).fetchall()
         return jsonify({"Shipper open routes": shipper_open_routes})
     return jsonify({"SQL": "ERROR"})
