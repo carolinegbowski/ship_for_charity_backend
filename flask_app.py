@@ -144,7 +144,23 @@ def open_routes():
 
 @app.route("/api/np_new_route", methods=["POST"])
 def np_new_route():
-    pass
+    data = request.get_json()
+    np_account_id = data.get('npAccountID')
+    route_id = data.get('routeID')
+    containers = int(data.get('containers'))
+    with connect(DBPATH) as connection:
+        cursor = connection.cursor()
+        SQL = """ INSERT INTO partnerships (np_account_id, route_id, containers) VALUES (?,?,?)"""
+        values = (np_account_id, route_id, containers)
+        cursor.execute(SQL, values)
+        SQL = """ SELECT available_containers FROM routes WHERE pk=?"""
+        available_containers = int(cursor.execute(SQL, (route_id,)).fetchone()[0])
+        available_containers -= containers
+        SQL = """ UPDATE routes SET available_containers=? WHERE pk=?"""
+        values = (available_containers, route_id)
+        cursor.execute(SQL, values)
+        return jsonify({'SQL': "updated"})
+    return jsonify({'SQL' : "ERROR"})
 
 
 @app.route("/api/shipper_previous_routes", methods=["POST"])
