@@ -34,21 +34,24 @@ def create_account():
 @app.route("/api/shipper_create_account", methods=["POST"])
 def shipper_account():
     data = request.get_json()
+    company_name = data.get("company")
     username = data.get("username")
     password = data.get("password")
     password = bytes(password, "utf-8")
     hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """INSERT INTO shipper_accounts (
-        username, password_hash) VALUES (?, ?);"""
-        values = (username, hashed_password)
+
+        SQL = """INSERT INTO shipper_accounts (company_name,
+        username, password_hash) VALUES (?, ?, ?);"""
+        values = (company_name, username, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM shipper_accounts
         WHERE username=? AND password_hash=?;"""
+        values = (username, hashed_password)
+        shipper_pk = cursor.execute(SQL, (values)).fetchone()[0]
 
-        shipper_pk = cursor.execute(SQL, values).fetchone()[0]
         return jsonify({"pk": shipper_pk})
     return jsonify({"SQL": "ERROR"})
 
@@ -133,7 +136,10 @@ def open_routes():
     date = int(datetime.datetime.strptime(arrival_date, "%m/%d/%y").strftime("%s"))
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """ SELECT * FROM routes WHERE departure_location=?
+        SQL = """ SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, routes.departure_location, routes.departure_date, 
+                routes.arrival_location, routes.arrival_date, routes.total_containers, routes.available_containers
+                FROM routes JOIN shipper_accounts ON shipper_accounts.pk=routes.shipper_account_id 
+                WHERE departure_location=?
                 AND arrival_location=? AND arrival_date < ?
                 AND departure_date > strftime('%s'); """
         values = (departure_location, arrival_location, date)
@@ -148,27 +154,40 @@ def np_new_route():
     np_account_id = data.get('npAccountID')
     route_id = data.get('routeID')
     containers = int(data.get('containers'))
+    print("input" , containers)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """ INSERT INTO partnerships (np_account_id, route_id, containers) VALUES (?,?,?)"""
+        SQL = """ INSERT INTO partnerships (np_account_id, route_id, containers) VALUES (?,?,?);"""
         values = (np_account_id, route_id, containers)
         cursor.execute(SQL, values)
+        print("inserted into partnerships")
         SQL = """ SELECT available_containers FROM routes WHERE pk=?"""
-        available_containers = int(cursor.execute(SQL, (route_id,)).fetchone()[0])
+        available_containers = cursor.execute(SQL, (route_id,)).fetchone()[0]
+        print("available containes", available_containers)
+        available_containers = int(available_containers)
+        print("udated available containes", available_containers)
         available_containers -= containers
         SQL = """ UPDATE routes SET available_containers=? WHERE pk=?"""
         values = (available_containers, route_id)
         cursor.execute(SQL, values)
+        print("updated")
         return jsonify({'SQL': "updated"})
     return jsonify({'SQL' : "ERROR"})
 
 
 @app.route("/api/shipper_previous_routes", methods=["POST"])
 def shipper_previous_routes():
+    data = request.get_json()
+    shipper_id = data.get('shipperAccountID')
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """SELECT * FROM routes WHERE departure_date < strftime('%s');"""
-        routes = cursor.execute(SQL,).fetchall()
+        SQL = """SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, routes.departure_location, routes.departure_date, 
+        routes.arrival_location, routes.arrival_date, routes.total_containers, routes.available_containers
+        FROM routes JOIN shipper_accounts ON shipper_accounts.pk=routes.shipper_account_id 
+        WHERE routes.shipper_account_id=? AND routes.departure_date < strftime('%s');"""
+        routes = cursor.execute(SQL,(shipper_id,)).fetchall()
+        print("ROUTES")
+        print(routes)
         return jsonify({"Routes": routes})
     return jsonify({"SQL": "ERROR"})
 
@@ -179,7 +198,10 @@ def shipper_open_routes():
     shipper_account_id = data.get("shipperAccountID")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """ SELECT * FROM routes WHERE shipper_account_id=?
+        SQL = """ SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, routes.departure_location, routes.departure_date, 
+                routes.arrival_location, routes.arrival_date, routes.total_containers, routes.available_containers
+                FROM routes JOIN shipper_accounts ON shipper_accounts.pk=routes.shipper_account_id 
+                WHERE shipper_account_id=?
                 AND departure_date > strftime('%s')
                 AND available_containers > 0;"""
         values = (shipper_account_id,)
