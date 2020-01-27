@@ -126,3 +126,6 @@ dmypy.json
 
 #Database
 *.db
+
+#Text files
+*.txt
