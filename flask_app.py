@@ -181,10 +181,12 @@ def shipper_previous_routes():
     shipper_id = data.get('shipperAccountID')
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, routes.departure_location, routes.departure_date, 
-        routes.arrival_location, routes.arrival_date, routes.total_containers, routes.available_containers
-        FROM routes JOIN shipper_accounts ON shipper_accounts.pk=routes.shipper_account_id 
-        WHERE routes.shipper_account_id=? AND routes.departure_date < strftime('%s');"""
+        SQL = """SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, 
+                routes.departure_location, routes.departure_date, 
+                routes.arrival_location, routes.arrival_date, 
+                routes.total_containers, routes.available_containers
+                FROM routes JOIN shipper_accounts ON shipper_accounts.pk=routes.shipper_account_id 
+                WHERE routes.shipper_account_id=? AND routes.departure_date < strftime('%s');"""
         routes = cursor.execute(SQL,(shipper_id,)).fetchall()
         print("ROUTES")
         print(routes)
@@ -198,8 +200,10 @@ def shipper_open_routes():
     shipper_account_id = data.get("shipperAccountID")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """ SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, routes.departure_location, routes.departure_date, 
-                routes.arrival_location, routes.arrival_date, routes.total_containers, routes.available_containers
+        SQL = """ SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, 
+                routes.departure_location, routes.departure_date, 
+                routes.arrival_location, routes.arrival_date, 
+                routes.total_containers, routes.available_containers
                 FROM routes JOIN shipper_accounts ON shipper_accounts.pk=routes.shipper_account_id 
                 WHERE shipper_account_id=?
                 AND departure_date > strftime('%s')
@@ -216,10 +220,16 @@ def np_previous_routes():
     np_account_id = data.get("npAccountID")
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
-        SQL = """ SELECT * FROM routes JOIN partnerships ON routes.pk = partnerships.route_id
+        SQL = """ SELECT shipper_accounts.pk, shipper_accounts.company_name, routes.pk, 
+                routes.departure_location, routes.departure_date, 
+                routes.arrival_location, routes.arrival_date, 
+                partnerships.containers 
+                FROM routes JOIN partnerships JOIN shipper_accounts 
+                ON routes.pk = partnerships.route_id AND shipper_accounts.pk = routes.shipper_account_id
                 WHERE np_account_id=?;"""
         values = (np_account_id,)
         np_previous_routes = cursor.execute(SQL, values).fetchall()
+        print(np_previous_routes)
         return jsonify({"NP previous routes": np_previous_routes})
     return jsonify({"SQL": "ERROR"})
 
