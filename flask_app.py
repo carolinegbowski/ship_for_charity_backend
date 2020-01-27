@@ -2,12 +2,21 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from util import hash_password, check_password
 from sqlite3 import connect
+import requests
 import datetime
+import os
 
 app = Flask(__name__)
 CORS(app)
 DBPATH = "final_project.db"
 
+
+CRED_DIR = os.path.join(os.getenv('HOME'), ".credentials" )
+SP_TOKEN = "CHARITYNAVIGATOR.txt"
+TOKENFILE = os.path.join(CRED_DIR, SP_TOKEN)
+token = open(TOKENFILE).read().strip()
+app_id = 'd497c23e'
+DEBUGGER = True
 
 @app.route("/api/np_create_account", methods=["POST"])
 def create_account():
@@ -30,6 +39,32 @@ def create_account():
         return jsonify({"pk": np_pk})
     return jsonify({"SQL": "ERROR"})
 
+@app.route("/api/np_check_EIN", methods=["POST"])
+def check_EIN():
+    if DEBUGGER == True:
+        res = {"charityNavigatorURL":"https://www.charitynavigator.org/?bay=search.profile&ein=000587764&utm_source=DataAPI&utm_content=6bc9f3c8","tagLine":null,"charityName":"Iglesia Bethesda Inc.","ein":"000587764","mission":null,"websiteURL":null,"activeAdvisories":{"_rapid_links":{"related":{"href":"https://api.data.charitynavigator.org/v2/Organizations/000587764/Advisories?status=ACTIVE"}}},"removedAdvisories":{"_rapid_links":{"related":{"href":"https://api.data.charitynavigator.org/v2/Organizations/000587764/Advisories?status=REMOVED"}}},"irsClassification":{"deductibility":"Contributions are deductible","subsection":"501(c)(3)","assetAmount":null,"nteeType":"Religion-Related, Spiritual Development","nteeSuffix":null,"incomeAmount":null,"filingRequirement":"990 - Not required to file (church) ","classification":"Religious Organization","latest990":null,"rulingDate":"January, 2004","nteeCode":"X21","groupName":null,"deductibilityCode":"1","affiliation":"Independent - the organization is an independent organization or an independent auxiliary (i.e., not affiliated with a National, Regional, or Geographic grouping of organizations).","foundationStatus":"Church 170(b)(1)(A)(i)","nteeClassification":"Protestant","accountingPeriod":"December","deductibilityDetail":null,"exemptOrgStatus":"Unconditional Exemption","exemptOrgStatusCode":"01","nteeLetter":"X"},"mailingAddress":{"country":null,"stateOrProvince":"MA","city":"LOWELL","postalCode":"01852-2348","streetAddress1":"157 ANDOVER ST","streetAddress2":null}}
+        return_data = {
+            'EIN': res['ein'], 
+            "Company Name": res['charityName']
+        }
+        return jsonify({"data": return_data})
+    else: 
+        data = request.get_json()
+        EIN = data.get("EIN")
+        api_url = "https://api.data.charitynavigator.org/v2/Organizations/{EIN}?app_id={app_id}&app_key={app_key}"
+        get_url = api_url.format(app_id=app_id, app_key=token, EIN=EIN)
+        response = requests.get(get_url)
+        if response.status_code == 200:
+            res = response.json()
+            return_data = {
+                'EIN': EIN, 
+                "Company Name": res['charityName']
+                }
+            return jsonify({"data": return_data})
+        else:
+            return jsonify({"EIN": "invalid"})
+
+    
 
 @app.route("/api/shipper_create_account", methods=["POST"])
 def shipper_account():
