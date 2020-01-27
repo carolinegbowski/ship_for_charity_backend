@@ -16,25 +16,27 @@ SP_TOKEN = "CHARITYNAVIGATOR.txt"
 TOKENFILE = os.path.join(CRED_DIR, SP_TOKEN)
 token = open(TOKENFILE).read().strip()
 app_id = 'd497c23e'
-DEBUGGER = True
+DEBUGGER = False
 
 @app.route("/api/np_create_account", methods=["POST"])
 def create_account():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
+    company_name = data.get("companyName")
+    ein = data.get("EIN")
     password = bytes(password, "utf-8")
     hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """INSERT INTO np_accounts (
-        username, password_hash) VALUES (?, ?);"""
-        values = (username, hashed_password)
+        company_name, ein, username, password_hash) VALUES (?, ?, ?, ?);"""
+        values = (company_name, ein, username, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM np_accounts
         WHERE username=? AND password_hash=?;"""
-
+        values = (username, hashed_password)
         np_pk = cursor.execute(SQL, values).fetchone()[0]
         return jsonify({"pk": np_pk})
     return jsonify({"SQL": "ERROR"})

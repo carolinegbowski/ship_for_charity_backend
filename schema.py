@@ -11,6 +11,7 @@ def schema(dbpath=DBPATH):
         SQL = """ CREATE TABLE np_accounts (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name VARCHAR,
+                ein VARCHAR,
                 username VARCHAR NOT NULL UNIQUE,
                 password_hash VARCHAR
         );"""
