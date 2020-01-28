@@ -13,6 +13,7 @@ def schema(dbpath=DBPATH):
                 company_name VARCHAR,
                 ein VARCHAR,
                 username VARCHAR NOT NULL UNIQUE,
+                email VARCHAR,
                 password_hash VARCHAR
         );"""
         cursor.execute(SQL)
@@ -22,6 +23,7 @@ def schema(dbpath=DBPATH):
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name VARCHAR,
                 username VARCHAR NOT NULL UNIQUE,
+                email VARCHAR,
                 password_hash VARCHAR
         );"""
         cursor.execute(SQL)
