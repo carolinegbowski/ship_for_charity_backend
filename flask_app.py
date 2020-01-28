@@ -24,14 +24,15 @@ def create_account():
     username = data.get("username")
     password = data.get("password")
     company_name = data.get("companyName")
+    email = data.get("email")
     ein = data.get("EIN")
     password = bytes(password, "utf-8")
     hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """INSERT INTO np_accounts (
-        company_name, ein, username, password_hash) VALUES (?, ?, ?, ?);"""
-        values = (company_name, ein, username, hashed_password)
+        company_name, ein, username, email, password_hash) VALUES (?, ?, ?, ?, ?);"""
+        values = (company_name, ein, username, email, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM np_accounts
@@ -74,14 +75,15 @@ def shipper_account():
     company_name = data.get("company")
     username = data.get("username")
     password = data.get("password")
+    email = data.get("email")
     password = bytes(password, "utf-8")
     hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
 
         SQL = """INSERT INTO shipper_accounts (company_name,
-        username, password_hash) VALUES (?, ?, ?);"""
-        values = (company_name, username, hashed_password)
+        username, email, password_hash) VALUES (?, ?, ?, ?);"""
+        values = (company_name, username, email, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM shipper_accounts
