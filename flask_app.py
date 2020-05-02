@@ -71,7 +71,6 @@ def check_EIN():
 @app.route("/api/shipper_create_account", methods=["POST"])
 def shipper_account():
     data = request.get_json()
-    ein = data.get("ein")
     company_name = data.get("company")
     # username = data.get("username")
     password = data.get("password")
