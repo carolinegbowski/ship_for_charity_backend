@@ -21,23 +21,22 @@ DEBUGGER = False
 @app.route("/api/np_create_account", methods=["POST"])
 def create_account():
     data = request.get_json()
-    username = data.get("username")
+    email = data.get("email")
     password = data.get("password")
     company_name = data.get("companyName")
-    email = data.get("email")
-    ein = data.get("EIN")
+    ein = data.get("ein")
     password = bytes(password, "utf-8")
     hashed_password = hash_password(password)
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
         SQL = """INSERT INTO np_accounts (
-        company_name, ein, username, email, password_hash) VALUES (?, ?, ?, ?, ?);"""
-        values = (company_name, ein, username, email, hashed_password)
+        company_name, ein, email, password_hash) VALUES (?, ?, ?, ?);"""
+        values = (company_name, ein, email, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM np_accounts
-        WHERE username=? AND password_hash=?;"""
-        values = (username, hashed_password)
+        WHERE email=? AND password_hash=?;"""
+        values = (email, hashed_password)
         np_pk = cursor.execute(SQL, values).fetchone()[0]
         return jsonify({"pk": np_pk})
     return jsonify({"SQL": "ERROR"})
@@ -53,14 +52,14 @@ def check_EIN():
         return jsonify({"data": return_data})
     else: 
         data = request.get_json()
-        EIN = data.get("EIN")
-        api_url = "https://api.data.charitynavigator.org/v2/Organizations/{EIN}?app_id={app_id}&app_key={app_key}"
-        get_url = api_url.format(app_id=app_id, app_key=token, EIN=EIN)
+        ein = data.get("EIN")
+        api_url = "https://api.data.charitynavigator.org/v2/Organizations/{ein}?app_id={app_id}&app_key={app_key}"
+        get_url = api_url.format(app_id=app_id, app_key=token, EIN=ein)
         response = requests.get(get_url)
         if response.status_code == 200:
             res = response.json()
             return_data = {
-                'EIN': EIN, 
+                'EIN': ein, 
                 "Company Name": res['charityName']
                 }
             return jsonify({"data": return_data})
@@ -72,8 +71,9 @@ def check_EIN():
 @app.route("/api/shipper_create_account", methods=["POST"])
 def shipper_account():
     data = request.get_json()
+    ein = data.get("ein")
     company_name = data.get("company")
-    username = data.get("username")
+    # username = data.get("username")
     password = data.get("password")
     email = data.get("email")
     password = bytes(password, "utf-8")
@@ -81,14 +81,14 @@ def shipper_account():
     with connect(DBPATH) as connection:
         cursor = connection.cursor()
 
-        SQL = """INSERT INTO shipper_accounts (company_name,
-        username, email, password_hash) VALUES (?, ?, ?, ?);"""
-        values = (company_name, username, email, hashed_password)
+        SQL = """INSERT INTO shipper_accounts (company_name, 
+        email, password_hash) VALUES (?, ?, ?);"""
+        values = (company_name, email, hashed_password)
         cursor.execute(SQL, values)
 
         SQL = """SELECT pk FROM shipper_accounts
-        WHERE username=? AND password_hash=?;"""
-        values = (username, hashed_password)
+        WHERE email=? AND password_hash=?;"""
+        values = (email, hashed_password)
         shipper_pk = cursor.execute(SQL, (values)).fetchone()[0]
 
         return jsonify({"pk": shipper_pk})

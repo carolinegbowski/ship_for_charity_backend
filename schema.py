@@ -12,20 +12,22 @@ def schema(dbpath=DBPATH):
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name VARCHAR,
                 ein VARCHAR,
-                username VARCHAR NOT NULL UNIQUE,
-                email VARCHAR,
+                email VARCHAR NOT NULL UNIQUE,
                 password_hash VARCHAR
         );"""
+        # username VARCHAR NOT NULL UNIQUE,
+
         cursor.execute(SQL)
 
         cursor.execute(DROPSQL.format(tablename="shipper_accounts"))
         SQL = """ CREATE TABLE shipper_accounts (
                 pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name VARCHAR,
-                username VARCHAR NOT NULL UNIQUE,
-                email VARCHAR,
+                email VARCHAR NOT NULL UNIQUE,
                 password_hash VARCHAR
         );"""
+        # username VARCHAR NOT NULL UNIQUE,
+
         cursor.execute(SQL)
 
         cursor.execute(DROPSQL.format(tablename="routes"))
